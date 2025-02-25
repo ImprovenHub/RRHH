@@ -269,7 +269,7 @@ def insertar_nuevas_valoracionesExcel(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones2.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -299,7 +299,7 @@ def insertar_nuevos_resultados(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones2.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -355,6 +355,8 @@ ponderaciones = {
 
 # Definir diccionario de usuarios y contraseñas
 diccUsu_Contra = pd.Series(dfContras["Contraseña"].values, index=dfContras["SUPERVISOR"]).to_dict()
+insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","id", "Fecha"])
+insertar_nuevos_resultados(df_resultados_nuevos, "retribuciones2", ["Evaluador", "Nombre", "Fecha"])
 # Inicializar estado de autenticación
 if 'authenticated' not in st.session_state:
     st.title('PROCESO DE EVALUACIÓN DEL DESEMPEÑO')
@@ -363,8 +365,7 @@ if 'authenticated' not in st.session_state:
 
 # Si está autenticado, continuar con el flujo de la aplicación
 if st.session_state.authenticated:
-    insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","id", "Fecha"])
-    insertar_nuevos_resultados(df_resultados_nuevos, "retribuciones2", ["Evaluador", "Nombre", "Fecha"])
+
 
     df_personas = maestroPersonas
     df_Puesto_pregs = PuestoPreg
