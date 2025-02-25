@@ -68,7 +68,7 @@ def eliminar_todas_las_tablas():
     conn.commit()
     conn.close()
 
-eliminar_todas_las_tablas()
+#eliminar_todas_las_tablas()
 
 def vaciar_bd_retribuciones2():
     conn = sqlite3.connect('retribuciones4.db')
@@ -269,7 +269,7 @@ def insertar_nuevas_valoracionesExcel(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones2.db')
+    conn = sqlite3.connect('retribuciones4.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -299,7 +299,7 @@ def insertar_nuevos_resultados(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones2.db')
+    conn = sqlite3.connect('retribuciones4.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
