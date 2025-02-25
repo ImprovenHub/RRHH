@@ -15,7 +15,7 @@ import urllib
 # In[25]:
 import streamlit as st
 
-uploaded_file= "VD_HERRAMIENTA POLÍTICA RETRIBUTIVA_GRUPO 3D SOLUTIONS-MKTG.xlsx"
+uploaded_file= "VD_HERRAMIENTA POLÍTICA RETRIBUTIVA_GRUPO 3D SOLUTIONS.xlsx"
 # In[27]:
 
 maestroPersonas= pd.read_excel(uploaded_file, sheet_name='Maestro personas')
