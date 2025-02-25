@@ -1426,7 +1426,7 @@ if st.session_state.authenticated:
                 st.markdown("<h4 style='font-size: 16px;'>Filtro por Empresa</h4>", unsafe_allow_html=True)
                 Empresa_seleccionada = st.selectbox(
                     'Selecciona la Empresa:',
-                    ['Todos'] + sorted(df_filtrado['Empresa'].unique().tolist()),
+                    ['Todos'] + sorted(df_personas_filtrado['Empresa'].unique().tolist()),
                     label_visibility='collapsed'
                 )
                 df_personas_filtrado = df_personas_filtrado if Empresa_seleccionada == "Todos" else df_personas_filtrado[df_personas_filtrado["Empresa"] == Empresa_seleccionada]
@@ -1579,7 +1579,7 @@ if st.session_state.authenticated:
                 df_filtrado = df_filtrado if evaluador_seleccionado == "Todos" else df_filtrado[df_filtrado["SUPERVISOR"] == evaluador_seleccionado]
                 df_filtrado = df_filtrado if Departamento_seleccionado == "Todos" else df_filtrado[df_filtrado["Departamento"] == Departamento_seleccionado]
                 df_filtrado = df_filtrado if seccion_seleccionada == "Todos" else df_filtrado[df_filtrado["Sección"] == seccion_seleccionada]
-                df_filtrado = df_filtrado if empresa_seleccionada == "Todos" else df_filtrado[df_filtrado["Empresa"] == empresa_seleccionada]
+                df_filtrado = df_filtrado if Empresa_seleccionada == "Todos" else df_filtrado[df_filtrado["Empresa"] == Empresa_seleccionada]
 
                 dfno_evaluados = df_personas[~df_personas['Nombre'].isin(df_Evaluadas['Nombre'])][['Nombre', 'SUPERVISOR']]
                 dfno_evaluados = dfno_evaluados.rename(columns={'SUPERVISOR': 'Evaluador'})
