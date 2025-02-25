@@ -68,7 +68,7 @@ def eliminar_todas_las_tablas():
     conn.commit()
     conn.close()
 
-#eliminar_todas_las_tablas()
+eliminar_todas_las_tablas()
 
 def vaciar_bd_retribuciones2():
     conn = sqlite3.connect('retribuciones4.db')
