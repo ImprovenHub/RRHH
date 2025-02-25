@@ -363,8 +363,8 @@ if 'authenticated' not in st.session_state:
 
 # Si está autenticado, continuar con el flujo de la aplicación
 if st.session_state.authenticated:
-    #insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","id", "Fecha"])
-    #insertar_nuevos_resultados(df_resultados_nuevos, "retribuciones2", ["Evaluador", "Nombre", "Fecha"])
+    insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","id", "Fecha"])
+    insertar_nuevos_resultados(df_resultados_nuevos, "retribuciones2", ["Evaluador", "Nombre", "Fecha"])
 
     df_personas = maestroPersonas
     df_Puesto_pregs = PuestoPreg
