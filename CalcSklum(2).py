@@ -432,7 +432,7 @@ if st.session_state.authenticated:
                 st.markdown("<h4 style='font-size: 16px;'>Filtro por Empresa</h4>", unsafe_allow_html=True)
                 Empresa_seleccionada = st.selectbox(
                     'Selecciona la Empresa:',
-                    ['Todos'] + sorted(df_filtrado['Empresa'].unique().tolist()),
+                    ['Todos'] + sorted(df_filtrado['Empresa'].dropna().astype(str).unique().tolist()),
                     label_visibility='collapsed'
                 )
 
@@ -1974,7 +1974,7 @@ if st.session_state.authenticated:
             st.markdown("<h4 style='font-size: 16px;'>Filtro por Empresa</h4>", unsafe_allow_html=True)
             Empresa_seleccionada = st.selectbox(
                     'Selecciona la Empresa:',
-                    ['Todos'] + sorted(df_filtrado['Empresa'].unique().tolist()),
+                    ['Todos'] + sorted(df_filtrado['Empresa'].dropna().astype(str).unique().tolist()),
                     label_visibility='collapsed'
                 )
  
@@ -2169,7 +2169,7 @@ if st.session_state.authenticated:
 
                     'Selecciona la Empresa:',
 
-                    ['Todos'] + sorted(df_filtrado['Empresa'].unique().tolist()),
+                    ['Todos'] + sorted(df_filtrado['Empresa'].dropna().astype(str).unique().tolist()),
 
                     label_visibility='collapsed'
 
