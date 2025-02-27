@@ -32,7 +32,7 @@ df_valoraciones = pd.read_excel(file_pathVals)
 df_resultados_nuevos = pd.read_excel(file_pathResuls)
 # In[33]:
 def conectar_db():
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones67.db')
     return conn
 
 
@@ -55,7 +55,7 @@ def apply_filters(df, area,  Evaluador, Puesto, Nombre):
     return df
 
 def eliminar_todas_las_tablas():
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones67.db')
     cursor = conn.cursor()
 
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name != 'sqlite_sequence';")
@@ -71,7 +71,7 @@ def eliminar_todas_las_tablas():
 #eliminar_todas_las_tablas()
 
 def vaciar_bd_retribuciones2():
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones67.db')
     cursor = conn.cursor()
 
     # Eliminar todos los registros de la tabla retribuciones2
@@ -86,14 +86,14 @@ def vaciar_bd_retribuciones2():
 #vaciar_bd_retribuciones2()
 
 def ver_datos():
-    conn= sqlite3.connect('retribuciones4.db')
+    conn= sqlite3.connect('retribuciones67.db')
     query = "SELECT * FROM valoraciones"
     dfvaloraciones = pd.read_sql(query, conn)
     conn.close()
     return dfvaloraciones
 
 def ver_datos2():
-    conn= sqlite3.connect('retribuciones4.db')
+    conn= sqlite3.connect('retribuciones67.db')
     query = "SELECT * FROM retribuciones2"
     dfretribuciones2 = pd.read_sql(query, conn)
     conn.close()
@@ -152,7 +152,7 @@ def crear_tablas():
 crear_tablas()
 
 def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones67.db')
     cursor = conn.cursor()
 
     for _, row in df_valoraciones_actualizadas.iterrows():
@@ -192,7 +192,7 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
     conn.commit()
     conn.close()
 def insertar_resultados_en_sql(df_resultados):
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones67.db')
     cursor = conn.cursor()
 
     for _, row in df_resultados.iterrows():
@@ -269,7 +269,7 @@ def insertar_nuevas_valoracionesExcel(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones67.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -299,7 +299,7 @@ def insertar_nuevos_resultados(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones4.db')
+    conn = sqlite3.connect('retribuciones67.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
