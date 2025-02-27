@@ -1948,7 +1948,7 @@ if st.session_state.authenticated:
                 ['Todos'] + sorted(df_personas['Área'].dropna().astype(str).unique().tolist()),
                 label_visibility='collapsed'
             )
-            df_filtrado = df_resultados if area_seleccionada == "Todos" else df_personas[df_personas["Área"] == area_seleccionada]
+            df_filtrado = df_resultados if area_seleccionada == "Todos" else df_resultados[df_resultados["Área"] == area_seleccionada]
             st.markdown("<h4 style='font-size: 16px;'>Filtro por Departamento</h4>", unsafe_allow_html=True)
 
             Departamento_seleccionado = st.selectbox(
