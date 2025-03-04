@@ -105,12 +105,13 @@ def ver_datos2():
     conn.close()
     return dfretribuciones2
 
-def crear_tablas(): 
-    conn = conectar_db() 
+def crear_tablas():
+    conn = sqlite3.connect('retribuciones67.db')  # Asegúrate de que es la base correcta
     cursor = conn.cursor()
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS valoraciones (
-             INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             Evaluador TEXT NOT NULL,
             Nombre TEXT NOT NULL,
             Área TEXT NOT NULL,
