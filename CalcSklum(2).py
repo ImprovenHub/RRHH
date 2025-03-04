@@ -146,9 +146,9 @@ def crear_tablas():
     Valoración_Obtenida INTEGER NOT NULL,
     Retribución_Actual REAL NOT NULL,
     RetrVariable_Actual REAL NOT NULL,
-    Retr_Propuesta REAL NOT NULL,
-    RetrVariable_Propuesta REAL NOT NULL,
-    Diferencia_Retr REAL NOT NULL,
+    Retr_Propuesta REAL,
+    RetrVariable_Propuesta REAL,
+    Diferencia_Retr REAL,
     Observación TEXT,
     Fecha TEXT NOT NULL
 )
