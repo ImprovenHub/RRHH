@@ -30,6 +30,9 @@ file_pathResuls= "ResultadosRRHH.xlsx"
 file_pathVals= "ValoracionesRRHH.xlsx"
 df_valoraciones = pd.read_excel(file_pathVals)
 df_resultados_nuevos = pd.read_excel(file_pathResuls)
+df_valoraciones['Fecha'] = pd.to_datetime(df_valoraciones['Fecha'], errors='coerce')
+df_resultados_nuevos['Fecha'] = pd.to_datetime(df_resultados_nuevos['Fecha'], errors='coerce')
+
 df_valoraciones['Fecha'] = df_valoraciones['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
 df_resultados_nuevos['Fecha'] = df_resultados_nuevos['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
 
