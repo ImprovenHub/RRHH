@@ -131,7 +131,7 @@ def crear_tablas():
           
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS retribuciones2 (
-     INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     Evaluador TEXT NOT NULL,
     Nombre TEXT NOT NULL,
     Área TEXT NOT NULL,
