@@ -143,7 +143,7 @@ def crear_tablas():
     Ponderación TEXT NOT NULL,
     Nivel TEXT NOT NULL,
     ItinerarioNivel TEXT NOT NULL,
-    Valoración_Obtena INTEGER NOT NULL,
+    Valoración_Obtenida INTEGER NOT NULL,
     Retribución_Actual REAL NOT NULL,
     RetrVariable_Actual REAL NOT NULL,
     Retr_Propuesta REAL NOT NULL,
