@@ -27,7 +27,7 @@ t4 = pd.read_excel(uploaded_file, sheet_name='TABLA 4')
 t2 = pd.read_excel(uploaded_file, sheet_name='TABLA 2')
 dfContras = maestroPersonas[["SUPERVISOR", "Director_Área","Contraseña"]]
 file_pathResuls= "ResultadosRRHH.xlsx"
-file_pathVals= "ValoracionesRRHH.xlsx"
+file_pathVals= "ValsFusionado_sin_duplicados.xlsx"
 df_valoraciones = pd.read_excel(file_pathVals)
 df_resultados_nuevos = pd.read_excel(file_pathResuls)
 df_valoraciones['Fecha'] = pd.to_datetime(df_valoraciones['Fecha'], errors='coerce')
