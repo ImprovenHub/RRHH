@@ -104,7 +104,7 @@ def crear_tablas():
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS valoraciones (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+             INTEGER PRIMARY KEY AUTOINCREMENT,
             Evaluador TEXT NOT NULL,
             Nombre TEXT NOT NULL,
             Área TEXT NOT NULL,
@@ -114,7 +114,7 @@ def crear_tablas():
             Ponderación TEXT NOT NULL,
             Sección TEXT NOT NULL,
             ItinerarioNivel TEXT NOT NULL,
-            idConocimiento INTEGER NOT NULL,
+            Conocimiento INTEGER NOT NULL,
             Conocimiento TEXT NOT NULL,
             TipoConocimientos TEXT NOT NULL,
             Valoración INTEGER NOT NULL,
@@ -125,7 +125,7 @@ def crear_tablas():
           
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS retribuciones2 (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+     INTEGER PRIMARY KEY AUTOINCREMENT,
     Evaluador TEXT NOT NULL,
     Nombre TEXT NOT NULL,
     Área TEXT NOT NULL,
@@ -136,7 +136,7 @@ def crear_tablas():
     Ponderación TEXT NOT NULL,
     Nivel TEXT NOT NULL,
     ItinerarioNivel TEXT NOT NULL,
-    Valoración_Obtenida INTEGER NOT NULL,
+    Valoración_Obtena INTEGER NOT NULL,
     Retribución_Actual REAL NOT NULL,
     RetrVariable_Actual REAL NOT NULL,
     Retr_Propuesta REAL NOT NULL,
@@ -167,7 +167,7 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
                 Empresa,
                 Ponderación,
                 ItinerarioNivel,
-                idConocimiento,
+                Conocimiento,
                 Conocimiento,
                 TipoConocimientos,
                 Valoración,
@@ -355,7 +355,7 @@ ponderaciones = {
 
 # Definir diccionario de usuarios y contraseñas
 diccUsu_Contra = pd.Series(dfContras["Contraseña"].values, index=dfContras["SUPERVISOR"]).to_dict()
-insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","id", "Fecha"])
+insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","idConocimiento", "Fecha"])
 insertar_nuevos_resultados(df_resultados_nuevos, "retribuciones2", ["Evaluador", "Nombre", "Fecha"])
 # Inicializar estado de autenticación
 if 'authenticated' not in st.session_state:
