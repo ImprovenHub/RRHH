@@ -362,7 +362,7 @@ ponderaciones = {
 
 # Definir diccionario de usuarios y contraseñas
 diccUsu_Contra = pd.Series(dfContras["Contraseña"].values, index=dfContras["SUPERVISOR"]).to_dict()
-insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","idConocimiento", "Fecha"])
+insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","Conocimiento", "Fecha"])
 insertar_nuevos_resultados(df_resultados_nuevos, "retribuciones2", ["Evaluador", "Nombre", "Fecha"])
 # Inicializar estado de autenticación
 if 'authenticated' not in st.session_state:
