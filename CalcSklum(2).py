@@ -30,6 +30,9 @@ file_pathResuls= "ResultadosRRHH.xlsx"
 file_pathVals= "ValoracionesRRHH.xlsx"
 df_valoraciones = pd.read_excel(file_pathVals)
 df_resultados_nuevos = pd.read_excel(file_pathResuls)
+df_valoraciones['Fecha'] = df_valoraciones['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
+df_resultados_nuevos['Fecha'] = df_resultados_nuevos['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
 # In[33]:
 def conectar_db():
     conn = sqlite3.connect('retribuciones67.db')
