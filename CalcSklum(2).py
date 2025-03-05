@@ -89,7 +89,7 @@ def vaciar_bd_retribuciones2():
     conn.close()
 
 # Llamar a la función para vaciar la base de datos
-vaciar_bd_retribuciones2()
+#vaciar_bd_retribuciones2()
 
 def ver_datos():
     conn= sqlite3.connect('retribuciones67.db')
