@@ -26,7 +26,7 @@ t33 = pd.read_excel(uploaded_file, sheet_name='Tabla3.3')
 t4 = pd.read_excel(uploaded_file, sheet_name='TABLA 4')
 t2 = pd.read_excel(uploaded_file, sheet_name='TABLA 2')
 dfContras = maestroPersonas[["SUPERVISOR", "Director_Área","Contraseña"]]
-file_pathResuls= "ResultadosRRHH.xlsx"
+file_pathResuls= "nuevo_archivo.xlsx"
 file_pathVals= "nuevo_archivoVals.xlsx"
 df_valoraciones = pd.read_excel(file_pathVals)
 df_resultados_nuevos = pd.read_excel(file_pathResuls)
