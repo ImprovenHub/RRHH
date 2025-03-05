@@ -2118,6 +2118,8 @@ if st.session_state.authenticated:
             df_filtrado = df_filtrado if Puesto_seleccionado == "Todos" else df_filtrado[df_filtrado["Puesto"] == Puesto_seleccionado]
             df_filtrado = df_filtrado if evaluador_seleccionado == "Todos" else df_filtrado[df_filtrado["Evaluador"] == evaluador_seleccionado]
             df_filtrado = df_filtrado if Departamento_seleccionado == "Todos" else df_filtrado[df_filtrado["Departamento"] == Departamento_seleccionado]
+            df_filtrado = df_filtrado if area_seleccionada == "Todos" else df_filtrado[df_filtrado["Área"] == area_seleccionada]
+
             df_filtrado = df_filtrado if seccion_seleccionada == "Todos" else df_filtrado[df_filtrado["Sección"] == seccion_seleccionada]
             df_filtrado = df_filtrado if Empresa_seleccionada == "Todos" else df_filtrado[df_filtrado["Empresa"] == Empresa_seleccionada]
             dfno_evaluados = df_filtrado[~df_filtrado['Nombre'].isin(df_Evaluadas['Nombre'])][['Nombre', 'SUPERVISOR']]
