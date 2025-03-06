@@ -121,10 +121,10 @@ def crear_tablas():
             Ponderación TEXT NOT NULL,
             Sección TEXT,
             ItinerarioNivel TEXT NOT NULL,
-            idConocimiento INTEGER NOT NULL,
-            Conocimiento TEXT NOT NULL,
-            TipoConocimientos TEXT NOT NULL,
-            Valoración INTEGER NOT NULL,
+            idConocimiento INTEGER,
+            Conocimiento TEXT,
+            TipoConocimientos TEXT,
+            Valoración INTEGER,
             Fecha TEXT NOT NULL
         )
 
