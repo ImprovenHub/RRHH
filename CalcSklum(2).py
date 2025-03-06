@@ -164,6 +164,10 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
 
     for _, row in df_valoraciones_actualizadas.iterrows():
         cursor.execute('''
+            DELETE FROM valoraciones
+            WHERE Evaluador = ? AND Nombre = ? AND Conocimiento = ? AND Fecha < ?
+        ''', (row['Evaluador'], row['Nombre'], row['Conocimiento'], row['Fecha']))
+        cursor.execute('''
             INSERT INTO valoraciones (
                 Evaluador,
                 Nombre,
@@ -198,11 +202,20 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
         ))
     conn.commit()
     conn.close()
+import sqlite3
+
 def insertar_resultados_en_sql(df_resultados):
     conn = sqlite3.connect('retribuciones67.db')
     cursor = conn.cursor()
 
     for _, row in df_resultados.iterrows():
+        # Eliminar registros antiguos si existe un Evaluador y Nombre iguales
+        cursor.execute('''
+            DELETE FROM retribuciones2 
+            WHERE Evaluador = ? AND Nombre = ? AND Fecha < ?
+        ''', (row['Evaluador'], row['Nombre'], row['Fecha']))
+        
+        # Insertar el nuevo registro
         cursor.execute('''
             INSERT INTO retribuciones2 (
                 Evaluador,
@@ -223,7 +236,7 @@ def insertar_resultados_en_sql(df_resultados):
                 Diferencia_Retr,
                 Observación,
                 Fecha
-            ) VALUES (?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             row['Evaluador'],  
             row['Nombre'],
@@ -244,9 +257,10 @@ def insertar_resultados_en_sql(df_resultados):
             row['Observación'],
             row['Fecha'],
         ))
-
+    
     conn.commit()
     conn.close()
+
 
 def show_logoImp():
     st.image("logoImproven.png", width=150)
