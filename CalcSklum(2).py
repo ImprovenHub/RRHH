@@ -36,9 +36,10 @@ df_resultados_nuevos['Fecha'] = pd.to_datetime(df_resultados_nuevos['Fecha'], er
 df_valoraciones['Fecha'] = df_valoraciones['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
 df_resultados_nuevos['Fecha'] = df_resultados_nuevos['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
 
+
 # In[33]:
 def conectar_db():
-    conn = sqlite3.connect('retribuciones67.db')
+    conn = sqlite3.connect('retribuciones55.db')
     return conn
 
 
@@ -61,7 +62,7 @@ def apply_filters(df, area,  Evaluador, Puesto, Nombre):
     return df
 
 def eliminar_todas_las_tablas():
-    conn = sqlite3.connect('retribuciones67.db')
+    conn = sqlite3.connect('retribuciones55.db')
     cursor = conn.cursor()
 
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name != 'sqlite_sequence';")
@@ -77,7 +78,7 @@ def eliminar_todas_las_tablas():
 #eliminar_todas_las_tablas()
 
 def vaciar_bd_retribuciones2():
-    conn = sqlite3.connect('retribuciones67.db')
+    conn = sqlite3.connect('retribuciones55.db')
     cursor = conn.cursor()
 
     # Eliminar todos los registros de la tabla retribuciones2
@@ -92,21 +93,21 @@ def vaciar_bd_retribuciones2():
 #vaciar_bd_retribuciones2()
 
 def ver_datos():
-    conn= sqlite3.connect('retribuciones67.db')
+    conn= sqlite3.connect('retribuciones55.db')
     query = "SELECT * FROM valoraciones"
     dfvaloraciones = pd.read_sql(query, conn)
     conn.close()
     return dfvaloraciones
 
 def ver_datos2():
-    conn= sqlite3.connect('retribuciones67.db')
+    conn= sqlite3.connect('retribuciones55.db')
     query = "SELECT * FROM retribuciones2"
     dfretribuciones2 = pd.read_sql(query, conn)
     conn.close()
     return dfretribuciones2
 
 def crear_tablas():
-    conn = sqlite3.connect('retribuciones67.db')  # Asegúrate de que es la base correcta
+    conn = sqlite3.connect('retribuciones55.db')  # Asegúrate de que es la base correcta
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -159,7 +160,7 @@ def crear_tablas():
 crear_tablas()
 
 def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
-    conn = sqlite3.connect('retribuciones67.db')
+    conn = sqlite3.connect('retribuciones55.db')
     cursor = conn.cursor()
 
     for _, row in df_valoraciones_actualizadas.iterrows():
@@ -178,7 +179,7 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
                 Empresa,
                 Ponderación,
                 ItinerarioNivel,
-                Conocimiento,
+                idConocimiento,
                 Conocimiento,
                 TipoConocimientos,
                 Valoración,
@@ -204,15 +205,19 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
     conn.close()
 import sqlite3
 
+import sqlite3
+
 def insertar_resultados_en_sql(df_resultados):
-    conn = sqlite3.connect('retribuciones67.db')
+    conn = sqlite3.connect('retribuciones55.db')
     cursor = conn.cursor()
 
     for _, row in df_resultados.iterrows():
-        # Eliminar registros antiguos si existe un Evaluador y Nombre iguales
+        # Verificar si hay un registro más antiguo antes de insertar el nuevo
         cursor.execute('''
-            DELETE FROM retribuciones2 
-            WHERE Evaluador = ? AND Nombre = ? AND Fecha < ?
+            DELETE FROM retribuciones2
+            WHERE Evaluador = ? 
+            AND Nombre = ?
+            AND Fecha < ?
         ''', (row['Evaluador'], row['Nombre'], row['Fecha']))
         
         # Insertar el nuevo registro
@@ -290,7 +295,7 @@ def insertar_nuevas_valoracionesExcel(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones67.db')
+    conn = sqlite3.connect('retribuciones55.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -320,7 +325,7 @@ def insertar_nuevos_resultados(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones67.db')
+    conn = sqlite3.connect('retribuciones55.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -606,8 +611,7 @@ if st.session_state.authenticated:
                             df_valoraciones_actualizadas = pd.concat([df_valoraciones_existentes, df_nuevas_valoraciones], ignore_index=True)
                             st.success("Valoraciones guardadas correctamente.")
                         
-                            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(
-                                subset=['Nombre', 'idConocimiento'], keep='last')
+                            #df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
                         
                             df_resultados = []
                             tprueb = t2[t2['Puesto'] == df_nuevas_valoraciones['Puesto'].iloc[0]]
@@ -739,15 +743,19 @@ if st.session_state.authenticated:
                             for col in columnas_monetarias:
                                 df_resultados[col] = df_resultados[col].apply(lambda x: f"{x:,.2f} €" if pd.notnull(x) else "N/A")
                             df_resultados["Valoración_Obtenida"] = df_resultados["Valoración_Obtenida"].round().astype(int)
-    
+                            df_resultados['Fecha'] = pd.to_datetime(df_resultados['Fecha'])
+
+
     
                             if 'df_valoraciones_actualizadas' in locals() and not df_valoraciones_actualizadas.empty:
-                                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
-                                df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Nombre'], keep='last')
+                                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre', 'idConocimiento'], keep='last')
+                                df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre'], keep='last')
                                 df_valoraciones_actualizadas['Departamento'].fillna('', inplace=True)
                                 df_valoraciones_actualizadas['Sección'].fillna('', inplace=True)
                                 df_resultados['Departamento'].fillna('', inplace=True)
                                 df_resultados['Sección'].fillna('', inplace=True)
+                                df_resultados['Fecha'] = df_resultados['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
                                 insertar_valoraciones_en_sql(df_valoraciones_actualizadas)
                                 insertar_resultados_en_sql(df_resultados)
                     else:
@@ -845,8 +853,8 @@ if st.session_state.authenticated:
                 df_personas = df_personas_filtrado if Nombre_seleccionado == "Todos" else df_personas_filtrado[df_personas_filtrado["Nombre"] == Nombre_seleccionado]
                 df_resultados = df_resultados_filtrado if Nombre_seleccionado == "Todos" else df_resultados_filtrado[df_resultados_filtrado["Nombre"] == Nombre_seleccionado]
 
-                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
-                df_resultados = df_resultados.sort_values('Valoración_Obtenida').drop_duplicates(subset=['Nombre'], keep='last')
+                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre', 'idConocimiento'], keep='last')
+                df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre'], keep='last')
                 #df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
                 #df_resultados = apply_filters(df_resultados, area_filter, Evaluador_filter,Puesto_filter, Nombre_filter)
   
@@ -986,7 +994,7 @@ if st.session_state.authenticated:
                 df_resultados = ver_datos2()
                 df_valoraciones_actualizadas = ver_datos()
                 df_valoraciones_actualizadas = df_valoraciones_actualizadas[df_valoraciones_actualizadas["Área"] == area_usuario]
-                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
+                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre', 'idConocimiento'], keep='last')
                 df_resultados = df_resultados[df_resultados["Evaluador"] == usuario_autenticado]
                 df_valoraciones_actualizadas = df_valoraciones_actualizadas[df_valoraciones_actualizadas["Evaluador"] == usuario_autenticado]
                 st.markdown("<h4 style='font-size: 16px;'>Filtro por Departamento</h4>", unsafe_allow_html=True)
@@ -1251,7 +1259,7 @@ if st.session_state.authenticated:
                             st.success("Valoraciones guardadas correctamente.")
                         
                             df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(
-                                subset=['Nombre', 'idConocimiento'], keep='last')
+                                subset=['Evaluador', 'Nombre', 'idConocimiento'], keep='last')
                         
                             df_resultados = []
                             tprueb = t2[t2['Puesto'] == df_nuevas_valoraciones['Puesto'].iloc[0]]
@@ -1383,11 +1391,14 @@ if st.session_state.authenticated:
                             for col in columnas_monetarias:
                                 df_resultados[col] = df_resultados[col].apply(lambda x: f"{x:,.2f} €" if pd.notnull(x) else "N/A")
                             df_resultados["Valoración_Obtenida"] = df_resultados["Valoración_Obtenida"].round().astype(int)
-        
-        
+                            df_resultados['Fecha'] = pd.to_datetime(df_resultados['Fecha'])
+
+
+    
                             if 'df_valoraciones_actualizadas' in locals() and not df_valoraciones_actualizadas.empty:
-                                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
-                                df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Nombre'], keep='last')
+                                df_resultados['Fecha'] = df_resultados['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
+                                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
+                                df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre'], keep='last')
                                 df_valoraciones_actualizadas['Departamento'].fillna('', inplace=True)
                                 df_valoraciones_actualizadas['Sección'].fillna('', inplace=True)
                                 df_resultados['Departamento'].fillna('', inplace=True)
@@ -1448,7 +1459,7 @@ if st.session_state.authenticated:
                 st.markdown("<h4 style='font-size: 16px;'>Filtro por Empresa</h4>", unsafe_allow_html=True)
                 Empresa_seleccionada = st.selectbox(
                     'Selecciona la Empresa:',
-                    ['Todos'] + sorted(df_personas_filtrado['Empresa'].unique().tolist()),
+                    ['Todos'] + sorted(df_personas_filtrado['Empresa'].dropna().astype(str).unique().tolist()),
                     label_visibility='collapsed'
                 )
                 df_personas_filtrado = df_personas_filtrado if Empresa_seleccionada == "Todos" else df_personas_filtrado[df_personas_filtrado["Empresa"] == Empresa_seleccionada]
@@ -1480,9 +1491,8 @@ if st.session_state.authenticated:
                 df_personas = df_personas_filtrado if Nombre_seleccionado == "Todos" else df_personas_filtrado[df_personas_filtrado["Nombre"] == Nombre_seleccionado]
                 df_resultados = df_resultados_filtrado if Nombre_seleccionado == "Todos" else df_resultados_filtrado[df_resultados_filtrado["Nombre"] == Nombre_seleccionado]
 
-                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
-                df_resultados = df_resultados.sort_values('Valoración_Obtenida').drop_duplicates(subset=['Nombre'], keep='last')
-                #df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
+                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre', 'idConocimiento'], keep='last')
+                df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre'], keep='last')
                 #df_resultados = apply_filters(df_resultados, area_filter, Evaluador_filter,Puesto_filter, Nombre_filter)
   
                 result_styled = df_resultados.style.applymap(highlight_cells, subset=['Diferencia_Retr'])
@@ -1622,7 +1632,7 @@ if st.session_state.authenticated:
                 df_resultados = ver_datos2()
                 df_valoraciones_actualizadas = ver_datos()
                 df_valoraciones_actualizadas = df_valoraciones_actualizadas[df_valoraciones_actualizadas["Área"] == area_usuario]
-                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
+                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
                 
                 st.markdown("<h4 style='font-size: 16px;'>Filtro por Departamento</h4>", unsafe_allow_html=True)
                 departamentos = df_resultados["Departamento"].dropna().astype(str).unique()
@@ -1740,9 +1750,9 @@ if st.session_state.authenticated:
             df_filtrado = df_filtrado if Nombre_seleccionado == "Todos" else df_filtrado[df_filtrado["Nombre"] == Nombre_seleccionado]
             df_resultados= df_filtrado
                     
-            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
-            df_resultados = df_resultados.sort_values('Valoración_Obtenida').drop_duplicates(subset=['Nombre'], keep='last')
-            #df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
+            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
+            df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre'], keep='last')
+            #df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
             #df_resultados = apply_filters(df_resultados, area_filter, Evaluador_filter,Puesto_filter, Nombre_filter)
 
 
@@ -1883,7 +1893,7 @@ if st.session_state.authenticated:
             # Obtener los datos solo una vez
             df_resultados = ver_datos2()
             df_valoraciones_actualizadas = ver_datos()
-            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
+            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
             st.markdown("<h4 style='font-size: 16px;'>Filtro por Área</h4>", unsafe_allow_html=True)
             area_seleccionada = st.selectbox(
                 'Selecciona el Área:',
@@ -2017,8 +2027,8 @@ if st.session_state.authenticated:
             df_filtrado = df_filtrado if Nombre_seleccionado == "Todos" else df_filtrado[df_filtrado["Nombre"] == Nombre_seleccionado]
             df_resultados= df_filtrado
                     
-            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
-            df_resultados = df_resultados.sort_values('Valoración_Obtenida').drop_duplicates(subset=['Nombre'], keep='last')
+            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
+            df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre'], keep='last')
 
 
             result_styled = df_resultados.style.applymap(highlight_cells, subset=['Diferencia_Retr'])
@@ -2130,7 +2140,7 @@ if st.session_state.authenticated:
             #Filtrar df_personas
             df_filtrado = df_personas if Nombre_seleccionado == "Todos" else df_personas[df_personas["Nombre"] == Nombre_seleccionado]
             df_filtrado = df_filtrado if Puesto_seleccionado == "Todos" else df_filtrado[df_filtrado["Puesto"] == Puesto_seleccionado]
-            df_filtrado = df_filtrado if evaluador_seleccionado == "Todos" else df_filtrado[df_filtrado["Evaluador"] == evaluador_seleccionado]
+            df_filtrado = df_filtrado if evaluador_seleccionado == "Todos" else df_filtrado[df_filtrado["SUPERVISOR"] == evaluador_seleccionado]
             df_filtrado = df_filtrado if Departamento_seleccionado == "Todos" else df_filtrado[df_filtrado["Departamento"] == Departamento_seleccionado]
             df_filtrado = df_filtrado if area_seleccionada == "Todos" else df_filtrado[df_filtrado["Área"] == area_seleccionada]
 
@@ -2156,7 +2166,7 @@ if st.session_state.authenticated:
             # Obtener los datos solo una vez
             df_resultados = ver_datos2()
             df_valoraciones_actualizadas = ver_datos()
-            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Nombre', 'idConocimiento'], keep='last')
+            df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
             st.markdown("<h4 style='font-size: 16px;'>Filtro por Área</h4>", unsafe_allow_html=True)
             area_seleccionada = st.selectbox(
                 'Selecciona el Área:',
