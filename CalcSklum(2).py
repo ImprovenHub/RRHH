@@ -378,7 +378,8 @@ ponderaciones = {
     "Ponderación 5": {"Responsabilidades y funciones": 0.45, "Conocimientos funcionales": 0.30, "Competencias": 0.25},
     "Ponderación 6": {"Responsabilidades y funciones": 0.55, "Conocimientos funcionales": 0.20, "Competencias": 0.25},
 }
-
+conn = sqlite3.connect('retribuciones55.db')
+conn.close() 
 # Definir diccionario de usuarios y contraseñas
 diccUsu_Contra = pd.Series(dfContras["Contraseña"].values, index=dfContras["SUPERVISOR"]).to_dict()
 insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","Conocimiento", "Fecha"])
