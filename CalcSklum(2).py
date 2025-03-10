@@ -157,9 +157,7 @@ def crear_tablas():
     
     conn.commit()
     conn.close()
-conn = sqlite3.connect('retribuciones55.db')
-conn.commit()
-conn.close() 
+
 crear_tablas()
 
 def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
@@ -296,7 +294,7 @@ def insertar_nuevas_valoracionesExcel(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones55.db')
+    conn = sqlite3.connect('retribuciones55.db', timeout=10)
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -326,7 +324,7 @@ def insertar_nuevos_resultados(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones55.db')
+    conn = sqlite3.connect('retribuciones55.db', timeout=10)
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -379,9 +377,7 @@ ponderaciones = {
     "Ponderación 5": {"Responsabilidades y funciones": 0.45, "Conocimientos funcionales": 0.30, "Competencias": 0.25},
     "Ponderación 6": {"Responsabilidades y funciones": 0.55, "Conocimientos funcionales": 0.20, "Competencias": 0.25},
 }
-conn = sqlite3.connect('retribuciones55.db')
-conn.commit()
-conn.close() 
+
 # Definir diccionario de usuarios y contraseñas
 diccUsu_Contra = pd.Series(dfContras["Contraseña"].values, index=dfContras["SUPERVISOR"]).to_dict()
 insertar_nuevas_valoracionesExcel(df_valoraciones, "valoraciones", ["Evaluador", "Nombre","Conocimiento", "Fecha"])
