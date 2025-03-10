@@ -158,6 +158,7 @@ def crear_tablas():
     conn.commit()
     conn.close()
 conn = sqlite3.connect('retribuciones55.db')
+conn.commit()
 conn.close() 
 crear_tablas()
 
@@ -379,6 +380,7 @@ ponderaciones = {
     "Ponderación 6": {"Responsabilidades y funciones": 0.55, "Conocimientos funcionales": 0.20, "Competencias": 0.25},
 }
 conn = sqlite3.connect('retribuciones55.db')
+conn.commit()
 conn.close() 
 # Definir diccionario de usuarios y contraseñas
 diccUsu_Contra = pd.Series(dfContras["Contraseña"].values, index=dfContras["SUPERVISOR"]).to_dict()
