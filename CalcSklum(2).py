@@ -105,8 +105,7 @@ def ver_datos2():
     dfretribuciones2 = pd.read_sql(query, conn)
     conn.close()
     return dfretribuciones2
-conn = sqlite3.connect('retribuciones55.db')
-conn.close()
+
 def crear_tablas():
     conn = sqlite3.connect('retribuciones55.db')  # Asegúrate de que es la base correcta
     cursor = conn.cursor()
