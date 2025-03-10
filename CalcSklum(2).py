@@ -157,6 +157,8 @@ def crear_tablas():
     
     conn.commit()
     conn.close()
+conn = sqlite3.connect('retribuciones55.db')
+conn.close() 
 crear_tablas()
 
 def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
@@ -203,8 +205,6 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
         ))
     conn.commit()
     conn.close()
-import sqlite3
-
 import sqlite3
 
 def insertar_resultados_en_sql(df_resultados):
