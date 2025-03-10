@@ -39,7 +39,7 @@ df_resultados_nuevos['Fecha'] = df_resultados_nuevos['Fecha'].dt.strftime('%Y-%m
 
 # In[33]:
 def conectar_db():
-    conn = sqlite3.connect('retribuciones55.db')
+    conn = sqlite3.connect('retribuciones55.db', timeout=10)
     return conn
 
 
@@ -62,7 +62,7 @@ def apply_filters(df, area,  Evaluador, Puesto, Nombre):
     return df
 
 def eliminar_todas_las_tablas():
-    conn = sqlite3.connect('retribuciones55.db')
+    conn = sqlite3.connect('retribuciones55.db', timeout=10)
     cursor = conn.cursor()
 
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name != 'sqlite_sequence';")
@@ -78,7 +78,7 @@ def eliminar_todas_las_tablas():
 #eliminar_todas_las_tablas()
 
 def vaciar_bd_retribuciones2():
-    conn = sqlite3.connect('retribuciones55.db')
+    conn = sqlite3.connect('retribuciones55.db', timeout=10)
     cursor = conn.cursor()
 
     # Eliminar todos los registros de la tabla retribuciones2
@@ -93,21 +93,21 @@ def vaciar_bd_retribuciones2():
 #vaciar_bd_retribuciones2()
 
 def ver_datos():
-    conn= sqlite3.connect('retribuciones55.db')
+    conn= sqlite3.connect('retribuciones55.db', timeout=10)
     query = "SELECT * FROM valoraciones"
     dfvaloraciones = pd.read_sql(query, conn)
     conn.close()
     return dfvaloraciones
 
 def ver_datos2():
-    conn= sqlite3.connect('retribuciones55.db')
+    conn= sqlite3.connect('retribuciones55.db', timeout=10)
     query = "SELECT * FROM retribuciones2"
     dfretribuciones2 = pd.read_sql(query, conn)
     conn.close()
     return dfretribuciones2
 
 def crear_tablas():
-    conn = sqlite3.connect('retribuciones55.db')  # Asegúrate de que es la base correcta
+    conn = sqlite3.connect('retribuciones55.db', timeout=10)  # Asegúrate de que es la base correcta
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -161,7 +161,7 @@ def crear_tablas():
 crear_tablas()
 
 def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
-    conn = sqlite3.connect('retribuciones55.db')
+    conn = sqlite3.connect('retribuciones55.db', timeout=10)
     cursor = conn.cursor()
 
     for _, row in df_valoraciones_actualizadas.iterrows():
@@ -207,7 +207,7 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
 import sqlite3
 
 def insertar_resultados_en_sql(df_resultados):
-    conn = sqlite3.connect('retribuciones55.db')
+    conn = sqlite3.connect('retribuciones55.db', timeout=10)
     cursor = conn.cursor()
 
     for _, row in df_resultados.iterrows():
