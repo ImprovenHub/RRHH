@@ -18,6 +18,8 @@ import streamlit as st
 uploaded_file= "VD_HERRAMIENTA_FILTRADA_RRHH.xlsx"
 # In[27]:
 
+
+
 maestroPersonas= pd.read_excel(uploaded_file, sheet_name='Maestro personas')
 PuestoPreg = pd.read_excel(uploaded_file, sheet_name='Puesto-Preguntas')
 #Resuls = pd.read_excel(uploaded_file, sheet_name='Resultados Objetivo')
@@ -39,7 +41,7 @@ df_resultados_nuevos['Fecha'] = df_resultados_nuevos['Fecha'].dt.strftime('%Y-%m
 
 # In[33]:
 def conectar_db():
-    conn = sqlite3.connect('retribuciones55.db', timeout=10)
+    conn = sqlite3.connect('retribuciones101.db')
     return conn
 
 
@@ -62,7 +64,7 @@ def apply_filters(df, area,  Evaluador, Puesto, Nombre):
     return df
 
 def eliminar_todas_las_tablas():
-    conn = sqlite3.connect('retribuciones55.db', timeout=10)
+    conn = sqlite3.connect('retribuciones101.db')
     cursor = conn.cursor()
 
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name != 'sqlite_sequence';")
@@ -78,7 +80,7 @@ def eliminar_todas_las_tablas():
 #eliminar_todas_las_tablas()
 
 def vaciar_bd_retribuciones2():
-    conn = sqlite3.connect('retribuciones55.db', timeout=10)
+    conn = sqlite3.connect('retribuciones101.db')
     cursor = conn.cursor()
 
     # Eliminar todos los registros de la tabla retribuciones2
@@ -93,21 +95,21 @@ def vaciar_bd_retribuciones2():
 #vaciar_bd_retribuciones2()
 
 def ver_datos():
-    conn= sqlite3.connect('retribuciones55.db', timeout=10)
+    conn= sqlite3.connect('retribuciones101.db')
     query = "SELECT * FROM valoraciones"
     dfvaloraciones = pd.read_sql(query, conn)
     conn.close()
     return dfvaloraciones
 
 def ver_datos2():
-    conn= sqlite3.connect('retribuciones55.db', timeout=10)
+    conn= sqlite3.connect('retribuciones101.db')
     query = "SELECT * FROM retribuciones2"
     dfretribuciones2 = pd.read_sql(query, conn)
     conn.close()
     return dfretribuciones2
 
 def crear_tablas():
-    conn = sqlite3.connect('retribuciones55.db', timeout=10)  # Asegúrate de que es la base correcta
+    conn = sqlite3.connect('retribuciones101.db')  # Asegúrate de que es la base correcta
     cursor = conn.cursor()
 
     cursor.execute('''
@@ -157,11 +159,10 @@ def crear_tablas():
     
     conn.commit()
     conn.close()
-
 crear_tablas()
 
 def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
-    conn = sqlite3.connect('retribuciones55.db', timeout=10)
+    conn = sqlite3.connect('retribuciones101.db')
     cursor = conn.cursor()
 
     for _, row in df_valoraciones_actualizadas.iterrows():
@@ -204,10 +205,9 @@ def insertar_valoraciones_en_sql(df_valoraciones_actualizadas):
         ))
     conn.commit()
     conn.close()
-import sqlite3
 
 def insertar_resultados_en_sql(df_resultados):
-    conn = sqlite3.connect('retribuciones55.db', timeout=10)
+    conn = sqlite3.connect('retribuciones101.db')
     cursor = conn.cursor()
 
     for _, row in df_resultados.iterrows():
@@ -294,7 +294,7 @@ def insertar_nuevas_valoracionesExcel(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones55.db', timeout=10)
+    conn = sqlite3.connect('retribuciones101.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -324,7 +324,7 @@ def insertar_nuevos_resultados(df, table_name, unique_columns):
         table_name (str): Nombre de la tabla en la base de datos
         unique_columns (list): Lista de columnas que identifican un registro único
     """
-    conn = sqlite3.connect('retribuciones55.db', timeout=10)
+    conn = sqlite3.connect('retribuciones101.db')
     cursor = conn.cursor()
     conditions = " AND ".join([f"{col} = ?" for col in unique_columns])
     check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {conditions}"
@@ -403,7 +403,11 @@ if st.session_state.authenticated:
 
     # Obtener el usuario autenticado
     usuario_autenticado = st.session_state.user
-
+    prueba = df_personas[df_personas["SUPERVISOR"] == usuario_autenticado]
+    
+    # Verificar si hay coincidencias antes de acceder a "Área"
+    if not prueba.empty:
+        empresa_usuario = prueba["Empresa"].iloc[0]
     # Filtrar por Evaluador o mostrar valoraciones si es administrador
     if usuario_autenticado not in ["admin", "admin2"]:
         # Verificar que la columna "SUPERVISOR" existe antes de filtrar
@@ -424,343 +428,8 @@ if st.session_state.authenticated:
         else:
             direct = "No"
         if direct=="No":
-            lat = st.sidebar.selectbox('Menú',('Evaluar','Resultados', 'Resultados en detalle'))
-            if lat=='Evaluar':
-                st.title('PROCESO DE EVALUACIÓN DEL DESEMPEÑO')            
-                st.markdown("<h4 style='font-size: 16px;'>Filtro por Departamento</h4>", unsafe_allow_html=True)
-                departamentos = df_filtrado["Departamento"].dropna().astype(str).unique()
-                Departamento_seleccionado = st.selectbox(
-                    'Selecciona el Departamento:',
-                    ['Todos'] + sorted(departamentos),
-                    label_visibility='collapsed')
-    
-                df_filtrado = df_filtrado if Departamento_seleccionado == "Todos" else df_filtrado[df_filtrado["Departamento"] == Departamento_seleccionado]
-                st.markdown("<h4 style='font-size: 16px;'>Filtro por Sección</h4>", unsafe_allow_html=True)
-        
-                seccion_seleccionada = st.selectbox(
-                    'Selecciona la Sección:',
-                    ['Todos'] + sorted(df_filtrado['Sección'].astype(str).unique().tolist()),
-                    label_visibility='collapsed'
-                )
-        
-                df_filtrado = df_filtrado if seccion_seleccionada == "Todos" else df_filtrado[df_filtrado["Sección"] == seccion_seleccionada]
-        
-                st.markdown("<h4 style='font-size: 16px;'>Filtro por Puesto</h4>", unsafe_allow_html=True)
-                Puesto_seleccionado = st.selectbox(
-                    'Selecciona el Puesto:',
-                    ['Todos'] + sorted(df_filtrado['Puesto'].unique().tolist()),
-                    label_visibility='collapsed'
-                )
-                        
-                df_valoraciones_actualizadas = ver_datos()
-                df_filtrado = df_filtrado if Puesto_seleccionado == "Todos" else df_filtrado[df_filtrado["Puesto"] == Puesto_seleccionado]
-                st.markdown("<h4 style='font-size: 16px;'>Filtro por Empresa</h4>", unsafe_allow_html=True)
-                Empresa_seleccionada = st.selectbox(
-                    'Selecciona la Empresa:',
-                    ['Todos'] + sorted(df_filtrado['Empresa'].dropna().astype(str).unique().tolist()),
-                    label_visibility='collapsed'
-                )
-
-                df_filtrado = df_filtrado if Empresa_seleccionada == "Todos" else df_filtrado[df_filtrado["Empresa"] == Empresa_seleccionada]
-                filtro_evaluacion = st.radio("Filtrar personas:",
-            ["No evaluadas", "Evaluadas"])
-                personas_evaluadas = df_valoraciones_actualizadas["Nombre"].str.strip().unique().tolist()
-                df_filtrado["Evaluada"] = df_filtrado["Nombre"].str.strip().isin(personas_evaluadas)
-                if filtro_evaluacion == "No evaluadas":
-                    df_filtrado = df_filtrado[~df_filtrado["Evaluada"]]
-                else:
-                    df_filtrado = df_filtrado[df_filtrado["Evaluada"]]
-                
-                
-                    # Determinar la persona seleccionada
-                Nombre_seleccionado = st.selectbox("Selecciona una persona a valorar:", df_filtrado["Nombre"].unique())
-                if not df_filtrado.empty:
-    
-                    evaluada = Nombre_seleccionado.strip() in df_valoraciones_actualizadas["Nombre"].str.strip().values
-                    if evaluada:
-                        st.markdown('<p style="color:red;">Persona ya evaluada</p>', unsafe_allow_html=True)
             
-                    persona = df_filtrado[df_filtrado["Nombre"] == Nombre_seleccionado].iloc[0]
-                    area_persona = persona["Área"]
-                    Puesto_persona = persona["Puesto"]
-                    Departamento_persona = persona["Departamento"]
-                    seccion_persona = persona["Sección"]
-                    empresa_persona = persona["Empresa"]
-                    ItinerarioNivel = persona["ItinerarioNivel"]
-                    Ponderación = persona["Ponderación"]
-                    st.write(f"Área: **{area_persona}** | Puesto: **{Puesto_persona}**")
-            
-                    Conocimientos = df_Puesto_pregs[(df_Puesto_pregs["Área"] == area_persona) & 
-                                                    (df_Puesto_pregs["Puesto"] == Puesto_persona)]
-                    
-                    if not Conocimientos.empty:
-                        st.markdown("**Instrucciones del cuestionario:**")
-                        valoraciones = []
-                        Fecha_actual = datetime.now()
-            
-                        st.markdown("""
-                        En el presente cuestionario aparecen los criterios definidos (Responsabilidades, Conocimientos funcionales y Competencias) y validados en la ficha de desarrollo.<br><br>
-                        El objetivo del cuestionario consiste en realizar la valoración de dichos criterios. Esta información nos será útil, solo si se responde de una manera sincera y objetiva.<br><br>
-                        Gracias por tu colaboración.
-                        """, unsafe_allow_html=True)
-            
-                        tipo_actual = None
-                        
-                        for i in range(len(Conocimientos)):
-                            row = Conocimientos.iloc[i]
-                            Conocimiento = row["Conocimiento"]
-                            tipo_Conocimiento = row["TipoPreguntas"]
-                            opciones = opciones_respuestas.get(tipo_Conocimiento, ["No disponible"])
-                            idConocimiento = row["ID Conocimiento"]
-            
-                            # Asegurar que "Nombre" y "idConocimiento" sean del mismo tipo en df_valoraciones_actualizadas
-                            df_valoraciones_actualizadas["Nombre"] = df_valoraciones_actualizadas["Nombre"].str.strip()
-                            df_valoraciones_actualizadas["idConocimiento"] = df_valoraciones_actualizadas["idConocimiento"].astype(str)
-                            idConocimiento = str(idConocimiento)  # Convertimos la variable al mismo tipo
-                            
-                            # Buscar la respuesta previa si la persona ya fue evaluada
-                            if evaluada:
-                                valoracion_previa = df_valoraciones_actualizadas.query(
-                                    "Nombre == @Nombre_seleccionado and idConocimiento == @idConocimiento"
-                                )["Valoración"]
-                                
-                                # Si hay una respuesta previa, tomarla; si no, None
-                                if not valoracion_previa.empty:
-                                    valoracion_seleccionada = valoracion_previa.iloc[0]  # Usa iloc en lugar de values[0]
-                                else:
-                                    valoracion_seleccionada = None
-                            else:
-                                valoracion_seleccionada = None
-        
-                            # Agregar título del tipo de Conocimiento si cambia
-                            if tipo_Conocimiento != tipo_actual:
-                                st.subheader(f"{tipo_Conocimiento}")
-                                tipo_actual = tipo_Conocimiento
-            
-                            st.markdown(f"""
-                                <div style="font-weight: bold; font-size: 18px; margin-bottom: -15px;">
-                                    {Conocimiento}
-                                </div>""", unsafe_allow_html=True)
-                            
-                            # Preseleccionar la respuesta previa en el radio button
-                            valoracion = st.radio(
-                                "", opciones, key=f"Conocimiento_{idConocimiento}", index=opciones.index(valoracion_seleccionada) if valoracion_seleccionada in opciones else 0
-                            )
-                            
-            
-                            valoraciones.append({
-                                "Evaluador": usuario_autenticado,
-                                "Nombre": Nombre_seleccionado,
-                                "Área": area_persona,
-                                "Puesto": Puesto_persona,
-                                "Departamento": Departamento_persona,
-                                "Sección": seccion_persona,
-                                "Empresa": empresa_persona,
-                                "Ponderación": Ponderación,
-                                "ItinerarioNivel": ItinerarioNivel,
-                                "idConocimiento": idConocimiento,
-                                "Conocimiento": Conocimiento,
-                                "TipoConocimientos": tipo_Conocimiento,
-                                "Valoración": valoracion,
-                                "Fecha": (Fecha_actual + timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
-                            })
-        
-        
-                        observacion = st.text_area(
-                            "Añadir observación (opcional):", 
-                            key=f"Observacion_{idConocimiento}",
-                            help="Puedes escribir comentarios adicionales sobre la evaluación.")    
-                        if st.button("Guardar valoraciones"):
-                            
-                            df_nuevas_valoraciones = pd.DataFrame(valoraciones)
-                            def ponderar_valoracion_puntu(row, *args, **kwargs):
-                                puesto = row.get("Puesto", None)
-                                tipo_pregunta = row.get("TipoConocimientos", None)  # Tomamos TipoPreguntas
-                            
-                                if puesto is None or tipo_pregunta is None:
-                                    return 0  # Evita errores en caso de datos mal formateados
-                            
-                                # 🔹 Filtrar df_personas sin sobrescribirlo
-                                df_filtrado = df_personas[df_personas['Puesto'] == puesto]
-                            
-                                if df_filtrado.empty:
-                                    return 0  # Evita errores si el puesto no existe en df_personas
-                            
-                                # 🔹 Extraer la ponderación del puesto
-                                ponderacion_key = df_filtrado["Ponderación"].values[0]  # Tomar el primer valor si hay duplicados
-                            
-                                # 🔹 Buscar la ponderación en la estructura de ponderaciones
-                                ponderacion_puesto = ponderaciones.get(ponderacion_key, {})
-                            
-                                # 🔹 Obtener la ponderación específica para el tipo de pregunta
-                                ponderacion = ponderacion_puesto.get(tipo_pregunta, 1)  # Si no hay, usa 1 por defecto
-                                                        
-                                # 🔹 Aplicar ponderación a la columna 'Valoración' directamente
-                                return row["Valoración"] * ponderacion
-    
-                            # Convertir las respuestas en valores numéricos
-                            df_nuevas_valoraciones["Valoración"] = df_nuevas_valoraciones.apply(
-                            lambda row: opciones_respuestas[row["TipoConocimientos"]].get(row["Valoración"], 0), axis=1
-                        )
-                            df_nuevas_valoraciones["Valoración_Ponderada"] = df_nuevas_valoraciones.apply(ponderar_valoracion_puntu, axis=1)
-    
-                            # Sumar la valoración ponderada para obtener el total
-                            valoracion_total = df_nuevas_valoraciones["Valoración_Ponderada"].sum()
-                        
-                            df_valoraciones_actualizadas = pd.concat([df_valoraciones_existentes, df_nuevas_valoraciones], ignore_index=True)
-                            st.success("Valoraciones guardadas correctamente.")
-                        
-                            #df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
-                        
-                            df_resultados = []
-                            tprueb = t2[t2['Puesto'] == df_nuevas_valoraciones['Puesto'].iloc[0]]
-                            tprueb = pd.DataFrame(tprueb)
-                            tprueb = tprueb.iloc[:, :-1]  
-                            cols_numericas = tprueb.columns[6:]  # Desde la columna Junior en adelante
-                            tprueb[cols_numericas] = tprueb[cols_numericas].apply(pd.to_numeric, errors='coerce').fillna(0)
-                            def ponderar_valoracion(row, *args, **kwargs):
-                                puesto = row.get("Puesto", None)
-                                tipo_pregunta = row.get("TipoPreguntas", None)  # Tomamos TipoPreguntas
-                            
-                                if puesto is None or tipo_pregunta is None:
-                                    return 0  # Evita errores en caso de datos mal formateados
-                            
-                                # 🔹 Filtrar df_personas sin sobrescribirlo
-                                df_filtrado = df_personas[df_personas['Puesto'] == puesto]
-                            
-                                if df_filtrado.empty:
-                                    return 0  # Evita errores si el puesto no existe en df_personas
-                            
-                                # 🔹 Extraer la ponderación del puesto
-                                ponderacion_key = df_filtrado["Ponderación"].values[0]  # Tomar el primer valor si hay duplicados
-                            
-                                # 🔹 Buscar la ponderación en la estructura de ponderaciones
-                                ponderacion_puesto = ponderaciones.get(ponderacion_key, {})
-                            
-                                # 🔹 Obtener la ponderación específica para el tipo de pregunta
-                                ponderacion = ponderacion_puesto.get(tipo_pregunta, 1)  # Si no hay, usa 1 por defecto
-                                                        
-                                # 🔹 Aplicar ponderación a las columnas de valores, excluyendo la última
-                                return row.iloc[6:] * ponderacion
-                            
-                            # Aplicar la función a tprueb
-                            tprueb_ponderado = tprueb.apply(ponderar_valoracion, axis=1)
-    
-                            suma_columnas = tprueb_ponderado.sum()
-                            # Sumar todas las valoraciones numéricas
-                            suma_columnas = pd.to_numeric(suma_columnas, errors='coerce')
-                            # Asegurarnos de que suma_columnas sea un diccionario válido
-                            suma_columnas = dict(suma_columnas)  # Convertir a diccionario si es necesario
-                            
-                            # Convertir valores a float para evitar errores de comparación
-                            suma_columnas = {str(k).strip(): float(v) for k, v in suma_columnas.items()}
-                            valoracion = pd.to_numeric(valoracion, errors='coerce')
-                            df_filtrado = df_nuevas_valoraciones
-                        
-                            # Calcular la puntuación total
-                            Nombre = df_filtrado.iloc[0]['Nombre']
-                            Fecha = df_filtrado.iloc[0]['Fecha']
-                            Evaluador = df_filtrado.iloc[0]['Evaluador']
-                            ItinerarioNivel = df_filtrado.iloc[0]['ItinerarioNivel']
-                            Departamento= df_filtrado.iloc[0]['Departamento']
-                            seccion= df_filtrado.iloc[0]['Sección']
-                            empresa= df_filtrado.iloc[0]['Empresa']
-                            Ponderación= df_filtrado.iloc[0]['Ponderación']
-                            Puesto = df_filtrado.iloc[0]['Puesto'].replace('\u00A0', '')
-                            area= df_filtrado.iloc[0]['Área'].replace('\u00A0', '')
-                            Nivel = None  # Nivel por defecto si no encuentra otro
-                            ultimo_nivel = None  # Guarda el último nivel evaluado antes del correcto
-                            penultimo_nivel_valido = None  # Guarda el penúltimo nivel válido (con valor > 0)
-                            primer_nivel = next(iter(suma_columnas))  # Obtiene el primer nivel de la tabla
-                            ultimo_nivel_valido= None
-    
-                            # Recorrer los niveles y comparar la valoración con los valores de referencia
-                            for nivel, valor_referencia in suma_columnas.items():
-                            
-                                if valor_referencia > 0:  # Solo actualizar si el nivel tiene un valor mayor a 0
-                                    if penultimo_nivel_valido is not None:
-                                        ultimo_nivel_valido = penultimo_nivel_valido
-                                    penultimo_nivel_valido = nivel  # Actualiza el penúltimo nivel válido
-                            
-                                if valor_referencia > 0 and valoracion_total < valor_referencia:
-                                    # Asignar el penúltimo nivel válido antes de encontrar uno mayor
-                                    if ultimo_nivel_valido:
-                                        Nivel = ultimo_nivel_valido
-                                        break  # Detener el ciclo una vez que se asigna un nivel
-                            
-                                ultimo_nivel = nivel  # Guarda el último nivel evaluado (aunque tenga valor 0)
-                            
-                            # Si no se asignó un nivel, asignar el penúltimo nivel válido
-                            if Nivel is None:
-                                if ultimo_nivel_valido:  # Si encontramos un nivel válido, asignamos el penúltimo nivel válido
-                                    Nivel = ultimo_nivel_valido
-                                else:  # Si no, asignamos el nivel con mayor valor
-                                    max_nivel = max(suma_columnas, key=suma_columnas.get)  # Obtener el nivel con el valor más alto
-                                    Nivel = max_nivel
-                            
-                            # Si la valoración es mayor que todos los niveles, asignar el nivel más alto
-                            max_nivel = max(suma_columnas, key=suma_columnas.get)  # Obtener el nivel con el valor más alto
-                            if valoracion_total >= suma_columnas[max_nivel]:  # Ahora incluye igualdad
-                                Nivel = max_nivel                            
-    
-                            st.session_state.Nivel = Nivel 
-                            bsresp = float(str(t33[(t33['Puesto'] == Puesto) & (t33['Nivel'] == Nivel)]['Rango Retributivo'].iloc[0]).replace(',', '.'))
-                            BANDASALARIAL= bsresp
-                            
-                            df_filtrado_t4 = t4[(t4['Nombre'] == Nombre) & (t4['Puesto'] == Puesto)]
-                            RetrVariable_Propuesta= 0
-                            if not df_filtrado_t4.empty:
-                                RETIBUCIÓNACTUAL = float(str(df_filtrado_t4['Salario Bruto Año'].iloc[0]).replace(',', '.'))
-                                RetrVariable_Actual= float(str(df_filtrado_t4['Salario Variable Actual'].iloc[0]).replace(',', '.'))
-                            else:
-                                pass
-                                RETIBUCIÓNACTUAL = 0.0
-                                RetrVariable_Actual= 0.0
-                            Diferencia_Retr = RETIBUCIÓNACTUAL-BANDASALARIAL
-                            df_resultados.append({'Evaluador': Evaluador,
-                                                  'Nombre': Nombre,
-                                                  'Área': area,
-                                                  'Puesto': Puesto,
-                                                  'Departamento': Departamento,
-                                                  'Sección': seccion,
-                                                  'Empresa': empresa,
-                                                  'Ponderación':Ponderación,
-                                                  'Nivel': Nivel,
-                                                  'ItinerarioNivel': ItinerarioNivel,
-                                                  'Valoración_Obtenida': valoracion_total,
-                                                  'Retribución_Actual': RETIBUCIÓNACTUAL,
-                                                  'RetrVariable_Actual': RetrVariable_Actual,
-                                                  'Retr_Propuesta': BANDASALARIAL,                                          
-                                                  'RetrVariable_Propuesta': RetrVariable_Propuesta,
-                                                  'Diferencia_Retr': Diferencia_Retr,
-                                                  'Observación':observacion,
-                                                  "Fecha": Fecha})
-                            df_resultados=pd.DataFrame(df_resultados)
-                            columnas_monetarias = ['Retribución_Actual',
-                                    'RetrVariable_Actual', 'Retr_Propuesta', 'RetrVariable_Propuesta', 'Diferencia_Retr']
-                                # Formatear las columnas numéricas
-                            for col in columnas_monetarias:
-                                df_resultados[col] = df_resultados[col].apply(lambda x: f"{x:,.2f} €" if pd.notnull(x) else "N/A")
-                            df_resultados["Valoración_Obtenida"] = df_resultados["Valoración_Obtenida"].round().astype(int)
-                            df_resultados['Fecha'] = pd.to_datetime(df_resultados['Fecha'])
-
-
-    
-                            if 'df_valoraciones_actualizadas' in locals() and not df_valoraciones_actualizadas.empty:
-                                df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre', 'idConocimiento'], keep='last')
-                                df_resultados = df_resultados.sort_values('Fecha').drop_duplicates(subset=['Evaluador', 'Nombre'], keep='last')
-                                df_valoraciones_actualizadas['Departamento'].fillna('', inplace=True)
-                                df_valoraciones_actualizadas['Sección'].fillna('', inplace=True)
-                                df_resultados['Departamento'].fillna('', inplace=True)
-                                df_resultados['Sección'].fillna('', inplace=True)
-                                df_resultados['Fecha'] = df_resultados['Fecha'].dt.strftime('%Y-%m-%d %H:%M:%S')
-
-                                insertar_valoraciones_en_sql(df_valoraciones_actualizadas)
-                                insertar_resultados_en_sql(df_resultados)
-                    else:
-                        st.warning(f"No hay ficha de desarrollo, por lo que no se puede proceder a la evaluación. Contactar con RRHH (imengual@sklum.com).")
-                else:
-                    st.warning("No se encontraron Nombres para este Evaluador.")
+            lat = st.sidebar.selectbox('Menú',('Resultados', 'Resultados en detalle'))
             if lat == 'Resultados':
                 st.title("RESULTADOS DEL PROCESO DE EVALUACIÓN DEL DESEMPEÑO")                        
                 df_valoraciones_actualizadas = ver_datos()
@@ -826,19 +495,7 @@ if st.session_state.authenticated:
                 df_personas_filtrado = df_personas_filtrado if Empresa_seleccionada == "Todos" else df_personas_filtrado[df_personas_filtrado["Empresa"] == Empresa_seleccionada]
                 df_resultados_filtrado = df_resultados_filtrado if Puesto_seleccionado == "Todos" else df_resultados_filtrado[df_resultados_filtrado["Puesto"] == Puesto_seleccionado]
                 
-                st.markdown("<h4 style='font-size: 16px;'>Filtro por Evaluador</h4>", unsafe_allow_html=True)
-                evaluadores = df_personas_filtrado["SUPERVISOR"].dropna().astype(str).unique().tolist()
-                
-                evaluador_seleccionado = st.selectbox(
-                    'Selecciona el Evaluador:',
-                    ['Todos'] + sorted(evaluadores),
-                    label_visibility='collapsed'
-                )
-                
-                # Filtrar por Evaluador
-                df_personas_filtrado = df_personas_filtrado if evaluador_seleccionado == "Todos" else df_personas_filtrado[df_personas_filtrado["SUPERVISOR"] == evaluador_seleccionado]
-                df_resultados_filtrado = df_resultados_filtrado if evaluador_seleccionado == "Todos" else df_resultados_filtrado[df_resultados_filtrado["Evaluador"] == evaluador_seleccionado]
-                
+                                
                 st.markdown("<h4 style='font-size: 16px;'>Filtro por Nombre</h4>", unsafe_allow_html=True)
                 nombres = df_personas_filtrado["Nombre"].dropna().astype(str).unique().tolist()
                 
@@ -970,7 +627,6 @@ if st.session_state.authenticated:
                 #Filtrar df_personas
                 df_filtrado = df_personas if Nombre_seleccionado == "Todos" else df_personas[df_personas["Nombre"] == Nombre_seleccionado]
                 df_filtrado = df_filtrado if Puesto_seleccionado == "Todos" else df_filtrado[df_filtrado["Puesto"] == Puesto_seleccionado]
-                df_filtrado = df_filtrado if evaluador_seleccionado == "Todos" else df_filtrado[df_filtrado["SUPERVISOR"] == evaluador_seleccionado]
                 df_filtrado = df_filtrado if Departamento_seleccionado == "Todos" else df_filtrado[df_filtrado["Departamento"] == Departamento_seleccionado]
                 df_filtrado = df_filtrado if seccion_seleccionada == "Todos" else df_filtrado[df_filtrado["Sección"] == seccion_seleccionada]
 
@@ -1034,6 +690,18 @@ if st.session_state.authenticated:
  
                 df_filtrado = df_filtrado if Empresa_seleccionada == "Todos" else df_filtrado[df_filtrado["Empresa"] == Empresa_seleccionada]
                 # Organizar las columnas
+                st.markdown("<h4 style='font-size: 16px;'>Filtro por Nombre</h4>", unsafe_allow_html=True)
+                nombres = df_filtrado["Nombre"].dropna().astype(str).unique().tolist()
+                
+                Nombre_seleccionado = st.selectbox(
+                    'Selecciona el Nombre:',
+                    ['Todos'] + sorted(nombres),
+                    label_visibility='collapsed'
+                )
+                
+                # Filtrar por Nombre
+                df_filtrado = df_filtrado if Nombre_seleccionado == "Todos" else df_filtrado[df_filtrado["Nombre"] == Nombre_seleccionado]
+
                 df_valoraciones_actualizadas= df_filtrado            
                 cols = [col for col in df_valoraciones_actualizadas.columns if col != 'Fecha'] + ['Fecha']
                 df_valoraciones_actualizadas = df_valoraciones_actualizadas[cols]
@@ -1052,7 +720,10 @@ if st.session_state.authenticated:
     
         
         if direct=="Sí":
+            df_filtrado = maestroPersonas
             
+            df_filtrado = df_filtrado[df_filtrado["Empresa"] == empresa_usuario]
+            df_filtrado = df_filtrado[df_filtrado["Área"] == area_usuario]
             lat = st.sidebar.selectbox('Menú',('Evaluar','Resultados Área', 'Resultados en detalle Área'))
             if lat=='Evaluar':
                 st.title('PROCESO DE EVALUACIÓN DEL DESEMPEÑO')
@@ -1122,7 +793,11 @@ if st.session_state.authenticated:
                     
                     df_valoraciones_actualizadas = ver_datos()  # Cargar las valoraciones guardadas
                     
-                    evaluada = Nombre_seleccionado.strip() in df_valoraciones_actualizadas["Nombre"].str.strip().values
+                    # Convertir la columna a string y rellenar NaN con cadena vacía
+                    df_valoraciones_actualizadas["Nombre"] = df_valoraciones_actualizadas["Nombre"].fillna("").astype(str)
+                    
+                    # Ahora puedes hacer la comparación tranquilamente
+                    evaluada = Nombre_seleccionado.strip() in df_valoraciones_actualizadas["Nombre"].values
                     if evaluada:
                         st.markdown('<p style="color:red;">Persona ya evaluada</p>', unsafe_allow_html=True)
             
@@ -1413,6 +1088,7 @@ if st.session_state.authenticated:
                 st.title("RESULTADOS DEL PROCESO DE EVALUACIÓN DEL DESEMPEÑO")                        
                 df_valoraciones_actualizadas = ver_datos()
                 df_resultados = ver_datos2()
+                df_resultados = df_resultados[df_resultados["Empresa"] == empresa_usuario]
                 df_resultados = df_resultados[df_resultados["Área"] == area_usuario]
                 df_valoraciones_actualizadas = df_valoraciones_actualizadas[df_valoraciones_actualizadas["Área"] == area_usuario]
                 df_personas = df_personas[df_personas["Área"] == area_usuario]
@@ -1630,6 +1306,7 @@ if st.session_state.authenticated:
                 # Obtener los datos solo una vez
                 df_resultados = ver_datos2()
                 df_valoraciones_actualizadas = ver_datos()
+                df_valoraciones_actualizadas = df_valoraciones_actualizadas[df_valoraciones_actualizadas["Empresa"] == empresa_usuario]
                 df_valoraciones_actualizadas = df_valoraciones_actualizadas[df_valoraciones_actualizadas["Área"] == area_usuario]
                 df_valoraciones_actualizadas = df_valoraciones_actualizadas.sort_values('Fecha').drop_duplicates(subset=['Evaluador','Nombre', 'idConocimiento'], keep='last')
                 
@@ -1667,7 +1344,22 @@ if st.session_state.authenticated:
                 )
  
                 df_filtrado = df_filtrado if Empresa_seleccionada == "Todos" else df_filtrado[df_filtrado["Empresa"] == Empresa_seleccionada]
-                df_valoraciones_actualizadas = ver_datos()
+                st.markdown("<h4 style='font-size: 16px;'>Filtro por Evaluador</h4>", unsafe_allow_html=True)
+                evaluador_seleccionado = st.selectbox(
+                    'Selecciona el Evaluador:',
+                    ['Todos'] + sorted(df_filtrado['Evaluador'].dropna().astype(str).unique().tolist()),
+                    label_visibility='collapsed'
+                )
+                df_filtrado = df_filtrado if evaluador_seleccionado == "Todos" else df_filtrado[df_filtrado["Evaluador"] == evaluador_seleccionado]
+
+                st.markdown("<h4 style='font-size: 16px;'>Filtro por Nombre</h4>", unsafe_allow_html=True)
+                nombres = df_filtrado["Nombre"].dropna().astype(str).unique().tolist()
+                 
+                Nombre_seleccionado = st.selectbox(
+                     'Selecciona el Nombre:',
+                     ['Todos'] + sorted(nombres),
+                     label_visibility='collapsed'
+                 )
                 df_valoraciones_actualizadas= df_filtrado            
     
                 # Organizar las columnas
